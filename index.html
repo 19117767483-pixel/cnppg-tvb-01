@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CNPPG-TVB-01 · 兼容非接触式 PPG 测试验证板</title>
+<style>
+  /* ============ 设计变量：合工大校徽 森林绿 + 奶油色 ============ */
+  :root{
+    --g900:#0f3524;
+    --g800:#16452d;
+    --g700:#1e5c3b;
+    --g600:#2b7a50;
+    --g500:#38a061;
+    --g400:#5cc084;
+    --g200:#bfe6cf;
+    --g100:#d8f0e2;
+    --g50:#ecf8f0;
+    --cream:#efe9d6;
+    --cream2:#f7f4ea;
+    --ink:#122a1f;
+    --ink2:#33503f;
+    --mut:#6b8275;
+    --line:#e2eae4;
+    --card:#ffffff;
+    --r:20px;
+    --sh-sm:0 2px 10px rgba(15,53,36,.06);
+    --sh-md:0 12px 32px rgba(15,53,36,.10);
+    --sh-lg:0 28px 64px rgba(15,53,36,.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    color:var(--ink);line-height:1.62;-webkit-font-smoothing:antialiased;background:var(--cream2);overflow-x:hidden;
+  }
+
+  /* ============ 固定背景：渐变 + 校徽水印 ============ */
+  .bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:
+      radial-gradient(1100px 540px at 90% -10%, rgba(56,160,97,.16) 0%, transparent 60%),
+      radial-gradient(820px 480px at -8% 34%, rgba(30,92,59,.10) 0%, transparent 56%),
+      radial-gradient(900px 620px at 50% 116%, rgba(239,233,214,.95) 0%, transparent 62%),
+      var(--cream2);}
+  .bg::after{content:"";position:absolute;top:-10%;right:-16%;width:64vw;height:64vw;
+    background:url('logo_ink.png') no-repeat center/contain;opacity:.055}
+  .bg::before{content:"";position:absolute;left:-14%;bottom:-24%;width:52vw;height:52vw;
+    background:url('logo_ink.png') no-repeat center/contain;opacity:.04}
+  .page{position:relative;z-index:1}
+
+  .wrap{max-width:1140px;margin:0 auto;padding:0 26px}
+
+  /* ============ 顶部导航 ============ */
+  header{position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);background:rgba(247,244,234,.76);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--g800);letter-spacing:.4px}
+  .brand .lg{width:32px;height:32px;border-radius:9px;background:#fff;box-shadow:var(--sh-sm);overflow:hidden;display:flex;align-items:center;justify-content:center;padding:3px}
+  .brand .lg img{width:100%;height:100%;object-fit:contain}
+  .links{display:flex;gap:3px}
+  .links a{text-decoration:none;color:var(--ink2);font-size:13px;padding:7px 12px;border-radius:999px;transition:.25s;white-space:nowrap}
+  .links a:hover{background:var(--g100);color:var(--g700)}
+
+  /* ============ Hero：渐变面板 ============ */
+  .hero{padding:32px 0 8px}
+  .hero-panel{position:relative;overflow:hidden;border-radius:30px;padding:44px 46px 40px;
+    background:linear-gradient(135deg,#ffffff 0%,#f2faf5 42%,var(--cream) 100%);
+    border:1px solid var(--g100);box-shadow:var(--sh-lg)}
+  .hero-panel::before{content:"";position:absolute;right:-12%;top:-30%;width:56%;height:150%;
+    background:url('logo_ink.png') no-repeat center/contain;opacity:.06;pointer-events:none}
+  .hero-panel::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(15,53,36,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(15,53,36,.035) 1px,transparent 1px);
+    background-size:40px 40px;
+    -webkit-mask-image:radial-gradient(circle at 20% 10%, #000 10%, transparent 70%);
+            mask-image:radial-gradient(circle at 20% 10%, #000 10%, transparent 70%)}
+  .hero-panel>*{position:relative;z-index:2}
+  /* 封面分栏：左文案 / 右产品实物图位 */
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:center;margin-bottom:28px}
+  .hero-media{display:flex;align-items:center;justify-content:center}
+  .product-slot{width:100%;aspect-ratio:4/3;border-radius:22px;border:2px dashed var(--g200);
+    background:radial-gradient(circle at 50% 38%,#eef9f2 0%,#fbfefc 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+    color:#7fa694;text-align:center;padding:24px}
+  .product-slot svg{width:46px;height:46px;color:#a9d3bd}
+  .product-slot .ps-title{font-size:14px;font-weight:700;color:#4c8a6f}
+  .product-slot .ps-hint{font-size:11.5px;color:#8fb3a2;line-height:1.55}
+  /* 封面产品实物图（2.jpg 为 1605×1305 横图，比例 1.23，用原比例不裁切） */
+  .product-img{width:100%;aspect-ratio:1605/1305;object-fit:cover;border-radius:22px;box-shadow:var(--sh-md);display:block}
+  /* 功能演示视频：屏幕上放视频，打印/PDF 时自动换成封面帧 */
+  .media-frame{position:relative;border-radius:14px;overflow:hidden;background:#0b1a12;margin-bottom:14px}
+  .media-video{width:100%;display:block;aspect-ratio:16/9;object-fit:contain;background:#0b1a12}
+  .media-poster{display:none;width:100%;aspect-ratio:16/9;object-fit:cover}
+  .hero-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+  .hero-logo{width:72px;height:72px;border-radius:20px;background:#fff;box-shadow:var(--sh-md);display:flex;align-items:center;justify-content:center;padding:8px}
+  .hero-logo img{width:100%;height:100%;object-fit:contain}
+  .hero-org .o1{display:block;font-weight:800;color:var(--g800);font-size:15.5px}
+  .hero-org .o2{display:block;font-size:12.5px;color:var(--mut);letter-spacing:.8px}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--g700);
+    background:rgba(216,240,226,.85);border:1px solid var(--g200);padding:6px 14px;border-radius:999px;letter-spacing:.4px}
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--g500);box-shadow:0 0 0 3px rgba(56,160,97,.22)}
+  h1.title{font-size:clamp(40px,6.6vw,72px);line-height:1.04;font-weight:900;letter-spacing:1px;
+    background:linear-gradient(116deg,#0f3524 0%,#1e5c3b 46%,#38a061 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;margin:8px 0 10px}
+  /* 分栏后左栏变窄，标题相应缩小以保证单行显示 */
+  .hero-grid .title{font-size:clamp(30px,4.3vw,54px);letter-spacing:.5px;white-space:nowrap}
+  .subtitle-en{font-size:clamp(14px,1.9vw,17px);color:var(--g700);font-weight:700;letter-spacing:.6px;margin-bottom:12px}
+  .lead{max-width:660px;font-size:16px;color:var(--ink2);margin-bottom:20px}
+  .lead strong{color:var(--g700)}
+  .chips{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:26px}
+  .chip{font-size:13px;font-weight:700;color:var(--g800);background:#fff;border:1px solid var(--line);
+    border-radius:12px;padding:8px 15px;box-shadow:var(--sh-sm);display:flex;align-items:center;gap:7px}
+  .chip svg{width:16px;height:16px;color:var(--g600)}
+  .hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .hstat{background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:15px;padding:14px 16px;position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s}
+  .hstat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--g400),var(--g600))}
+  .hstat:hover{transform:translateY(-4px);box-shadow:var(--sh-md)}
+  .hstat b{display:block;font-size:22px;color:var(--g700);letter-spacing:.4px}
+  .hstat span{font-size:12px;color:var(--mut)}
+
+  /* ============ 通用 section ============ */
+  section{padding:40px 0}
+  .sec-head{max-width:700px;margin-bottom:24px;position:relative}
+  .kicker{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:800;letter-spacing:3px;color:var(--g600);text-transform:uppercase}
+  .kicker::before{content:"";width:26px;height:2px;background:var(--g400);border-radius:2px}
+  .sec-head h2{font-size:clamp(23px,3.2vw,32px);font-weight:900;color:var(--g900);margin:9px 0 8px;letter-spacing:.4px}
+  .sec-head p{font-size:14.5px;color:var(--mut)}
+
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--sh-sm);
+    transition:transform .3s,box-shadow .3s,border-color .3s;position:relative;overflow:hidden}
+  .card::after{content:"";position:absolute;left:0;right:0;top:0;height:3px;
+    background:linear-gradient(90deg,var(--g400),var(--g600));transform:scaleX(0);transform-origin:left;transition:transform .35s}
+  .card:hover{transform:translateY(-5px);box-shadow:var(--sh-md);border-color:var(--g200)}
+  .card:hover::after{transform:scaleX(1)}
+  .icon-badge{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--g100),var(--cream));color:var(--g700);margin-bottom:12px}
+  .icon-badge svg{width:22px;height:22px}
+  .card h3{font-size:17px;font-weight:800;color:var(--g900);margin-bottom:7px}
+  .card p{font-size:13.5px;color:var(--mut)}
+
+  /* ============ 命名释义 ============ */
+  .naming{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .name-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh-sm);
+    position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s}
+  .name-card:hover{transform:translateY(-4px);box-shadow:var(--sh-md)}
+  .name-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--g400),var(--g600))}
+  .name-card .en{font-size:19px;font-weight:900;color:var(--g700);letter-spacing:.4px}
+  .name-card .cn{font-size:12px;color:var(--mut);margin-top:1px}
+  .name-card p{font-size:12.5px;color:var(--ink2);margin-top:8px}
+  .overview-lead{font-size:14.5px;color:var(--ink2);max-width:860px;margin-bottom:20px}
+  .overview-lead strong{color:var(--g700)}
+
+  /* ============ 具体功能（2列密集卡片） ============ */
+  .func-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .func{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--sh-sm);
+    display:flex;flex-direction:column;transition:transform .3s,box-shadow .3s,border-color .3s}
+  .func:hover{transform:translateY(-5px);box-shadow:var(--sh-md);border-color:var(--g200)}
+  .media-slot{aspect-ratio:16/9;border-radius:14px;border:1.5px dashed #a9d9bd;
+    background:radial-gradient(circle at 50% 42%,#eaf7f0 0%,#f6fbf8 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#7fa694;text-align:center;padding:14px;margin-bottom:14px}
+  .media-slot svg{width:34px;height:34px;color:#a3cdb8}
+  .media-slot .ms-title{font-size:12.5px;font-weight:700;color:#4c8a6f}
+  .media-slot .ms-hint{font-size:11px;color:#8fb3a2}
+  .func .f-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .f-num{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;
+    font-weight:800;color:#fff;background:linear-gradient(135deg,var(--g500),var(--g600));font-size:14px}
+  .func h3{font-size:16.5px;font-weight:800;color:var(--g900);line-height:1.3}
+  .func .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .func .tags span{font-size:11px;font-weight:700;color:var(--g700);background:var(--g50);border:1px solid var(--g100);border-radius:7px;padding:2px 8px}
+  .func p{font-size:13px;color:var(--mut)}
+
+  /* ============ 场景验证 ============ */
+  .scene{text-align:center;padding:20px 14px}
+  .scene .icon-badge{margin:0 auto 10px}
+  .scene h3{font-size:15.5px;font-weight:800;color:var(--g900);margin-bottom:5px}
+  .scene p{font-size:12.5px;color:var(--mut)}
+
+  /* ============ 合作单位及成果 ============ */
+  /* 合作单位 logo 墙 */
+  .logo-wall{display:grid;grid-template-columns:repeat(auto-fit,minmax(152px,1fr));gap:14px;margin-bottom:24px}
+  .logo-item{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 14px 14px;
+    box-shadow:var(--sh-sm);display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:12px;
+    min-height:132px;transition:transform .3s,box-shadow .3s,border-color .3s}
+  .logo-item:hover{transform:translateY(-4px);box-shadow:var(--sh-md);border-color:var(--g200)}
+  .logo-item .lb{flex:1;width:100%;display:flex;align-items:center;justify-content:center}
+  .logo-item .lb img{max-height:58px;max-width:100%;object-fit:contain}
+  .logo-item .ln{font-size:12.5px;font-weight:700;color:var(--ink2);text-align:center;line-height:1.35}
+  /* 占位槽：拿到官方 logo 后，把 .lb 里的文字换成 <img src="xxx.png" alt="名称"> 即可 */
+  .logo-item .lb.ph{width:100%;min-height:58px;border:1.5px dashed var(--g200);border-radius:10px;
+    display:flex;align-items:center;justify-content:center;color:#9dbdab;font-size:11px;font-weight:700;letter-spacing:.5px;background:var(--g50)}
+  .paper{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--sh-sm);
+    display:flex;flex-direction:column;gap:10px;transition:transform .3s,box-shadow .3s}
+  .paper:hover{transform:translateY(-5px);box-shadow:var(--sh-md)}
+  .paper .jr{align-self:flex-start;font-size:10.5px;font-weight:800;letter-spacing:1px;color:var(--g700);background:var(--g100);padding:4px 10px;border-radius:7px}
+  .paper .pt{font-size:14.5px;font-weight:800;color:var(--ink);line-height:1.4}
+  .paper .au{font-size:12.5px;color:var(--ink2)}
+  .paper .au b{color:var(--g700)}
+  .paper .meta{font-size:11.5px;color:var(--mut)}
+  .stats-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+  .stat-pill{background:linear-gradient(135deg,var(--g100),var(--cream));border:1px solid var(--g200);border-radius:13px;
+    padding:12px 20px;display:flex;align-items:center;gap:9px}
+  .stat-pill b{font-size:20px;color:var(--g700)}
+  .stat-pill span{font-size:12.5px;color:var(--ink2)}
+
+  /* ============ Footer 留白 ============ */
+  footer{padding:44px 0 64px;text-align:center}
+  footer .foot-logo{width:52px;height:52px;border-radius:14px;background:#fff;box-shadow:var(--sh-sm);
+    display:inline-flex;align-items:center;justify-content:center;overflow:hidden;padding:6px;margin-bottom:9px}
+  footer .foot-logo img{width:100%;height:100%;object-fit:contain}
+  footer .copyright{font-size:12px;color:#9bb8aa;letter-spacing:.4px}
+
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.visible{opacity:1;transform:none}
+
+  @media (max-width:900px){
+    .hero-panel{padding:30px 24px}
+    .hero-grid{grid-template-columns:1fr;gap:26px}
+    .hero-grid .title{white-space:normal;font-size:clamp(34px,9vw,52px)}
+    .hero-stats{grid-template-columns:repeat(2,1fr)}
+    .grid-3,.naming,.func-grid,.grid-2{grid-template-columns:1fr}
+    .links{display:none}
+    .bg::after,.bg::before{display:none}
+  }
+
+  /* ============ 打印 / 导出 PDF 优化 ============ */
+  @media print{
+    @page{size:A4;margin:8mm}
+    *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+    html,body{background:#fff !important}
+    .bg{display:none !important}
+    .reveal{opacity:1 !important;transform:none !important}
+    header{position:static;background:#fff}
+    .links{display:none}
+
+    /* A4 打印宽度约 794px，会命中 900px 手机断点 —— 这里强制恢复多栏 */
+    .hero-grid{grid-template-columns:1.05fr .95fr !important;gap:20px !important}
+    .hero-grid .title{white-space:nowrap !important;font-size:42px !important}
+    .hero-stats{grid-template-columns:repeat(4,1fr) !important}
+    .grid-2{grid-template-columns:repeat(2,1fr) !important}
+    .grid-3{grid-template-columns:repeat(3,1fr) !important}
+    .naming{grid-template-columns:repeat(3,1fr) !important}
+    .func-grid{grid-template-columns:repeat(2,1fr) !important}
+    .logo-wall{grid-template-columns:repeat(5,1fr) !important}
+
+    /* 渐变字 background-clip:text 在 PDF 里会糊成色块 —— 改实色 */
+    h1.title{background:none !important;color:#123828 !important;-webkit-text-fill-color:#123828 !important}
+
+    .wrap{max-width:100%;padding:0}
+    .hero{padding:0 0 4px}
+    .hero-panel{box-shadow:none !important;border-radius:14px;padding:20px 22px}
+    .hero-panel::after{display:none}
+    .product-slot{padding:14px}
+    .product-slot svg{width:32px;height:32px}
+    section{padding:12px 0}
+    .sec-head{margin-bottom:11px}
+    /* 论文卡与徽标墙收紧，避免指标条被挤到下一页 */
+    .grid-3{gap:12px !important}
+    .logo-wall{gap:10px !important}
+    .paper{padding:14px 16px;gap:8px}
+    .paper .pt{font-size:13px;line-height:1.35}
+    .paper .au{font-size:11.5px}
+    .paper .meta{font-size:10.5px}
+    .stats-row{margin-top:12px;gap:9px}
+    .stat-pill{padding:9px 15px}
+    .stat-pill b{font-size:17px}
+
+    /* 打印时视频换成封面帧（PDF 里放不了视频） */
+    .media-frame{margin-bottom:10px;background:#fff}
+    .media-video{display:none !important}
+    .media-poster{display:block !important;aspect-ratio:auto;height:104px;object-fit:cover}
+
+    .card,.func,.paper,.logo-item,.name-card,.hstat,.stat-pill,.product-slot{
+      break-inside:avoid;page-break-inside:avoid;box-shadow:none !important}
+    .sec-head{break-after:avoid;page-break-after:avoid}
+    .grid-2,.grid-3,.naming,.logo-wall,.stats-row{break-inside:avoid;page-break-inside:avoid}
+    .func-grid{break-inside:auto}
+    footer{padding:6px 0 0;break-inside:avoid;break-before:avoid;page-break-before:avoid}
+    footer .foot-logo{width:34px;height:34px;padding:4px;margin-bottom:4px}
+    footer .copyright{font-size:10.5px}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true"></div>
+
+<div class="page">
+
+  <!-- ===================== 顶部导航 ===================== -->
+  <header>
+    <div class="wrap nav">
+      <div class="brand">
+        <span class="lg"><img src="logo.png" alt="合肥工业大学" /></span>
+        <span>CNPPG-TVB-01</span>
+      </div>
+      <nav class="links">
+        <a href="#overview">总体概括</a>
+        <a href="#features">核心亮点</a>
+        <a href="#functions">具体功能</a>
+        <a href="#scenes">场景验证</a>
+        <a href="#partners">合作与成果</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===================== 封面 Hero ===================== -->
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-panel">
+        <div class="hero-grid">
+          <div class="hero-main">
+            <div class="hero-top">
+              <div class="hero-logo"><img src="logo.png" alt="合肥工业大学" /></div>
+              <div class="hero-org">
+                <span class="o1">合肥工业大学 · 集成电路创新学院 &amp; 微电子学院</span>
+                <span class="o2">PD-PSD 研究团队 · 非接触式健康监测</span>
+              </div>
+            </div>
+
+            <div class="pill"><span class="dot"></span>国内首块 · 兼容非接触式 PPG 测试验证板</div>
+            <h1 class="title">CNPPG-TVB-01</h1>
+            <div class="subtitle-en">Compatible Non-contact PPG Test &amp; Validation Board</div>
+            <p class="lead">为<strong>新型光电器件</strong>应用于 <strong>PPG 健康监测</strong>提供高效、可靠的一站式测试验证方案，让<strong>无感、连续、精准</strong>的生理参数测量成为可能。</p>
+
+            <div class="chips">
+              <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>无感非接触</span>
+              <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>抗环境光</span>
+              <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>医疗级精度</span>
+              <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>AI 智能解析</span>
+            </div>
+          </div>
+
+          <!-- ===== 产品实物图 ===== -->
+          <div class="hero-media">
+            <img class="product-img" src="2.jpg" alt="CNPPG-TVB-01 产品实物图" />
+          </div>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hstat"><b>非接触</b><span>无佩戴 · 无袖带 · 无贴片</span></div>
+          <div class="hstat"><b>fA 级</b><span>超低噪声模拟前端</span></div>
+          <div class="hstat"><b>0.2–5 Hz</b><span>精准生理频带滤波</span></div>
+          <div class="hstat"><b>&gt;90%</b><span>高血压风险分类准确率</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== 总体概括 ===================== -->
+  <section id="overview">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="kicker">Overview</span>
+        <h2>总体概括</h2>
+      </div>
+      <p class="overview-lead reveal">面向"健康中国 2030"与老龄化时代的连续健康监测需求，CNPPG-TVB-01 将<strong>新型高灵敏度光电二极管阵列</strong>、<strong>超低噪声模拟前端电路</strong>与<strong>AI 生理信号解析算法</strong>集成一体，为新型光电器件在 PPG 健康监测中的测试、验证与快速产品化提供标准化平台。</p>
+
+      <div class="naming reveal">
+        <div class="name-card">
+          <div class="en">CNPPG</div>
+          <div class="cn">Compatible Non-contact PPG</div>
+          <p>兼容非接触式光电容积脉搏波技术，摆脱接触式传感器佩戴负担，实现无感测量。</p>
+        </div>
+        <div class="name-card">
+          <div class="en">TVB</div>
+          <div class="cn">Test &amp; Validation Board</div>
+          <p>专注测试与验证的工程平台，提供从器件到系统的完整验证链路。</p>
+        </div>
+        <div class="name-card">
+          <div class="en">CN</div>
+          <div class="cn">中国 · 自主智造</div>
+          <p>"CN" 亦取自"中国"缩写，凝聚自主创新，代表新一代国产化光电健康监测方案。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 核心亮点 ===================== -->
+  <section id="features" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="kicker">Highlights</span>
+        <h2>核心亮点</h2>
+        <p>以"器件—电路—算法"协同创新，重新定义健康监测的无感体验与专业精度。</p>
+      </div>
+
+      <div class="grid-2 reveal">
+        <div class="card">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+          <h3>极致无感，体验革命</h3>
+          <p>彻底摆脱袖带压迫、手环佩戴、贴片过敏困扰，无感状态即可完成测量，实现"科技无形，健康随行"。</p>
+        </div>
+        <div class="card">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M3 12h1M20 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7"/></svg></div>
+          <h3>抗环境光，弱光精准</h3>
+          <p>无缝易集成光电二极管阵列 + 超低噪声电路，光谱抑制比优于 10³，弱光下依然采集高质量信号。</p>
+        </div>
+        <div class="card">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5-4 10-10 10S2 17 2 12 2 2 12 2z"/><path d="M12 6v6l4 2"/></svg></div>
+          <h3>医疗级精度，智能算法</h3>
+          <p>CNN-Transformer-GRU 三阶段特征融合，符合 AAMI/BHS 临床标准的动态血压估计，多项生命体征一次同步提取。</p>
+        </div>
+        <div class="card">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <h3>即放即用，全天候可靠</h3>
+          <p>物理隔离、即放即用，支持 24h 不间断数据流远程监测；通用光电元件 + STM32 主控，兼顾性能与成本。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 具体功能 ===================== -->
+  <section id="functions" style="background:linear-gradient(180deg,rgba(216,240,226,.45) 0%,transparent 92%)">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="kicker">Functions</span>
+        <h2>具体功能</h2>
+        <p>每项功能配套测试视频 / 测试图，直观呈现真实测量效果（占位待补充）。</p>
+      </div>
+
+      <div class="func-grid">
+        <div class="func reveal">
+          <div class="media-frame">
+            <video class="media-video" poster="poster-01.jpg" controls playsinline preload="none">
+              <source src="video-01.mp4" type="video/mp4" />
+            </video>
+            <img class="media-poster" src="poster-01.jpg" alt="功能 01 演示画面" />
+          </div>
+          <div class="f-head"><span class="f-num">01</span><h3>非接触式生命体征测量</h3></div>
+          <div class="tags"><span>心率</span><span>血压趋势</span><span>呼吸率</span><span>血氧</span></div>
+          <p>无需接触，一次测量同步提取心率、血压趋势、呼吸率，并提供过速/过缓、呼吸异常、高血压风险等综合预警，符合 AAMI/BHS 临床标准的动态血压估计。</p>
+        </div>
+
+        <div class="func reveal">
+          <div class="media-frame">
+            <video class="media-video" poster="poster-02.jpg" controls playsinline preload="none">
+              <source src="video-02.mp4" type="video/mp4" />
+            </video>
+            <img class="media-poster" src="poster-02.jpg" alt="功能 02 演示画面" />
+          </div>
+          <div class="f-head"><span class="f-num">02</span><h3>抗环境光干扰的信号采集</h3></div>
+          <div class="tags"><span>光谱抑制比 &gt;10³</span><span>近红外响应</span><span>弱光增强</span></div>
+          <p>无缝易集成光电二极管阵列与自滤光结构，在室内照明、自然光乃至夜间弱光下稳定提取微弱脉搏信号，显著优于传统宽带硅光电二极管。</p>
+        </div>
+
+        <div class="func reveal">
+          <div class="media-frame">
+            <video class="media-video" poster="poster-03.jpg" controls playsinline preload="none">
+              <source src="video-03.mp4" type="video/mp4" />
+            </video>
+            <img class="media-poster" src="poster-03.jpg" alt="功能 03 演示画面" />
+          </div>
+          <div class="f-head"><span class="f-num">03</span><h3>高保真低噪声模拟前端</h3></div>
+          <div class="tags"><span>ADA4350</span><span>飞安级 TIA</span><span>0.2–5Hz 带通</span></div>
+          <p>集成 FET 输入的 ADA4350 构建跨阻放大器前端，飞安级超低输入偏置电流确保微弱光电流高保真转换，级联精准带通滤波匹配人体 PPG 生理特征。</p>
+        </div>
+
+        <div class="func reveal">
+          <div class="media-frame">
+            <video class="media-video" poster="poster-04.jpg" controls playsinline preload="none">
+              <source src="video-04.mp4" type="video/mp4" />
+            </video>
+            <img class="media-poster" src="poster-04.jpg" alt="功能 04 演示画面" />
+          </div>
+          <div class="f-head"><span class="f-num">04</span><h3>AI 智能解析与风险分级</h3></div>
+          <div class="tags"><span>CNN</span><span>Transformer</span><span>GRU</span><span>高血压分类 &gt;90%</span></div>
+          <p>深度可分离 CNN 提取局部特征、Transformer 分析长程关联、GRU 建模时序动态，三阶段特征融合实现心血管风险智能识别与早期预警。</p>
+        </div>
+
+        <div class="func reveal">
+          <div class="media-frame">
+            <video class="media-video" poster="poster-05.jpg" controls playsinline preload="none">
+              <source src="video-05.mp4" type="video/mp4" />
+            </video>
+            <img class="media-poster" src="poster-05.jpg" alt="功能 05 演示画面" />
+          </div>
+          <div class="f-head"><span class="f-num">05</span><h3>新型光电器件兼容测试与验证</h3></div>
+          <div class="tags"><span>器件兼容</span><span>快速原型</span><span>标准化平台</span></div>
+          <p>作为国际首块兼容非接触式 PPG 测试验证板，为新型光电器件（异质结光电二极管、量子点器件等）提供从器件评估到系统集成的标准化高效验证方案。</p>
+        </div>
+
+        <div class="func reveal">
+          <div class="media-frame">
+            <video class="media-video" poster="poster-06.jpg" controls playsinline preload="none">
+              <source src="video-06.mp4" type="video/mp4" />
+            </video>
+            <img class="media-poster" src="poster-06.jpg" alt="功能 06 演示画面" />
+          </div>
+          <div class="f-head"><span class="f-num">06</span><h3>即放即用 · 24h 连续监测</h3></div>
+          <div class="tags"><span>物理隔离</span><span>即放即用</span><span>远程数据流</span></div>
+          <p>无需佩戴与操作，放置即可测量；支持 24 小时不间断数据流与远程健康监测，为长期趋势管理与异常预警提供连续数据支撑。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 场景验证 ===================== -->
+  <section id="scenes">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="kicker">Validation</span>
+        <h2>场景验证</h2>
+        <p>覆盖居家、车载、座椅等真实场景的实测验证，为规模化应用提供可靠的场景适配能力。</p>
+      </div>
+
+      <div class="grid-3 reveal">
+        <div class="card scene">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg></div>
+          <h3>居家测试</h3>
+          <p>日常家庭环境下无感、连续的生命体征监测验证。</p>
+        </div>
+        <div class="card scene">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></div>
+          <h3>行驶汽车测试</h3>
+          <p>车载动态环境下"精准、无感、连续"健康监测验证。</p>
+        </div>
+        <div class="card scene">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h4l2 4h12v2H6l-2-4H2z"/><path d="M4 12h16M4 18h10"/></svg></div>
+          <h3>座椅测试</h3>
+          <p>智能座椅 / 办公场景下的被动式健康监测验证。</p>
+        </div>
+        <div class="card scene">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg></div>
+          <h3>健康座舱</h3>
+          <p>奇瑞国际创新大会亮相，智能健康座舱标杆验证。</p>
+        </div>
+        <div class="card scene">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <h3>特殊人群监护</h3>
+          <p>烧伤、剥脱性皮炎、新生儿等接触受限人群监护验证。</p>
+        </div>
+        <div class="card scene">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+          <h3>24h 数据流</h3>
+          <p>物理隔离、即放即用，24h 不间断远程健康数据流。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 合作单位及相关成果 ===================== -->
+  <section id="partners" style="background:linear-gradient(180deg,rgba(216,240,226,.45) 0%,transparent 92%)">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="kicker">Partners &amp; Achievements</span>
+        <h2>合作单位及相关成果</h2>
+        <p>产学研协同与深厚科研积累，为产品提供权威学术与产业背书。</p>
+      </div>
+
+      <!-- 合作单位 logo 墙（全部为官方徽标，已抠透明底） -->
+      <div class="logo-wall reveal">
+        <div class="logo-item">
+          <div class="lb"><img src="logo_hfut.png" alt="合肥工业大学" /></div>
+          <span class="ln">合肥工业大学</span>
+        </div>
+        <div class="logo-item">
+          <div class="lb"><img src="logo_ustc.png" alt="中国科学技术大学" /></div>
+          <span class="ln">中国科学技术大学</span>
+        </div>
+        <div class="logo-item">
+          <div class="lb"><img src="logo_xtu.png" alt="湘潭大学" /></div>
+          <span class="ln">湘潭大学</span>
+        </div>
+        <div class="logo-item">
+          <div class="lb"><img src="logo_chery.png" alt="奇瑞汽车" /></div>
+          <span class="ln">奇瑞汽车</span>
+        </div>
+        <div class="logo-item">
+          <div class="lb"><img src="logo_hospital.png" alt="中国科学技术大学附属第一医院" /></div>
+          <span class="ln">中科大附属第一医院</span>
+        </div>
+      </div>
+
+      <div class="grid-3 reveal">
+        <div class="paper">
+          <span class="jr">SMALL</span>
+          <div class="pt">Non-Contact Photoplethysmography for In-Vehicle Health Monitoring With Seamlessly Integrated Photodetector Array and Hardware-Accelerated AI</div>
+          <div class="au"><b>陈元淦</b>（中国科学技术大学）等</div>
+          <div class="meta">车载非接触 PPG · 无缝集成光电探测器阵列 · 硬件加速 AI</div>
+        </div>
+        <div class="paper">
+          <span class="jr">ADV. HEALTHCARE MATER.</span>
+          <div class="pt">Ambient-Light-Immune NIR Photodetector Based on WS₂/SiHMs Heterojunction for Hypertension Taxonomy Via CNN Integration</div>
+          <div class="au"><b>赵亚琪</b>、徐浩岚、王欣、汪兰、谢思艺 等 · 于永强（通讯）</div>
+          <div class="meta">抗环境光近红外探测器 · 高血压 CNN 分类 · 2025</div>
+        </div>
+        <div class="paper">
+          <span class="jr">ADV. OPTICAL MATER.</span>
+          <div class="pt">High-performance Inverse Opal SnO₂/Te₀.₄Se₀.₆ Photodetector for Optical Communication and Health Monitoring</div>
+          <div class="au"><b>郝国林</b>（湘潭大学）· 于永强 等（共同通讯）</div>
+          <div class="meta">反蛋白石结构光电探测器 · 健康监测 · 2025</div>
+        </div>
+      </div>
+
+      <div class="stats-row reveal">
+        <span class="stat-pill"><b>90+</b><span>篇 SCI 论文</span></span>
+        <span class="stat-pill"><b>12</b><span>项发明专利（授权 10 项）</span></span>
+        <span class="stat-pill"><b>&gt;90%</b><span>高血压分类准确率</span></span>
+        <span class="stat-pill"><b>&gt;10³</b><span>光谱抑制比</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== Footer 留白 ===================== -->
+  <footer>
+    <div class="wrap">
+      <!-- TODO: 底部联系方式 / 二维码 / 公司信息留白，后续自行添加 -->
+      <div class="foot-logo"><img src="logo.png" alt="合肥工业大学" /></div>
+      <div class="copyright">CNPPG-TVB-01 · Compatible Non-contact PPG Test &amp; Validation Board</div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+  },{threshold:0.1, rootMargin:"0px 0px -20px 0px"});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
