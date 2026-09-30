@@ -120,6 +120,9 @@
   .sec-head{max-width:700px;margin-bottom:24px;position:relative}
   .kicker{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:800;letter-spacing:3px;color:var(--g600);text-transform:uppercase}
   .kicker::before{content:"";width:26px;height:2px;background:var(--g400);border-radius:2px}
+  /* 标题旁装饰：一条极淡的 PPG 脉搏波形 */
+  .kicker::after{content:"";width:58px;height:11px;margin-left:11px;opacity:.55;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 58 11'%3E%3Cpath d='M1 5.5h7l2.5-4 3.5 8 3.5-8 2.5 4h38' fill='none' stroke='%2338a061' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain}
   .sec-head h2{font-size:clamp(23px,3.2vw,32px);font-weight:900;color:var(--g900);margin:9px 0 8px;letter-spacing:.4px}
   .sec-head p{font-size:14.5px;color:var(--mut)}
 
@@ -167,12 +170,41 @@
   .func .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
   .func .tags span{font-size:11px;font-weight:700;color:var(--g700);background:var(--g50);border:1px solid var(--g100);border-radius:7px;padding:2px 8px}
   .func p{font-size:13px;color:var(--mut)}
+  /* 收尾大卡：横跨整行，视频左、文字右 */
+  .func.wide{grid-column:1/-1;flex-direction:row;align-items:center;gap:26px;padding:22px}
+  .func.wide .media-frame{flex:0 0 56%;margin-bottom:0}
+  .func.wide .f-body{flex:1;min-width:0}
+  .func.wide p{font-size:13.5px}
+  .checklist{list-style:none;margin:10px 0 14px;display:flex;flex-direction:column;gap:7px}
+  .checklist li{font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:9px}
+  .checklist li::before{content:"✓";flex:0 0 18px;height:18px;border-radius:50%;background:var(--g100);color:var(--g700);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .flow{display:flex;align-items:stretch;gap:7px}
+  .flow-step{flex:1;background:var(--g50);border:1px solid var(--g100);border-radius:12px;padding:9px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center}
+  .fs-num{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--g500),var(--g600));color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .fs-label{font-size:12px;font-weight:700;color:var(--g800);white-space:nowrap}
+  .flow-arrow{flex:0 0 auto;align-self:center;width:13px;height:13px;color:var(--g400)}
 
   /* ============ 场景验证 ============ */
   .scene{text-align:center;padding:20px 14px}
   .scene .icon-badge{margin:0 auto 10px}
   .scene h3{font-size:15.5px;font-weight:800;color:var(--g900);margin-bottom:5px}
   .scene p{font-size:12.5px;color:var(--mut)}
+
+  /* ============ 轻量装饰元素 ============ */
+  /* 具体功能区背景：超淡波形水印 */
+  #functions{position:relative}
+  #functions::before{content:"";position:absolute;inset:0;opacity:.05;pointer-events:none;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1400 320' preserveAspectRatio='xMidYMid slice'%3E%3Cpath d='M0 160h140l24-52 38 104 38-104 24 52h140l24-52 38 104 38-104 24 52h140l24-52 38 104 38-104 24 52h320' fill='none' stroke='%231e5c3b' stroke-width='2'/%3E%3C/svg%3E") no-repeat center/cover}
+  #functions .wrap{position:relative;z-index:1}
+  /* 场景验证标题旁：柔和光斑（光学主题） */
+  #scenes .sec-head{position:relative}
+  #scenes .sec-head::after{content:"";position:absolute;right:6px;top:10px;width:130px;height:64px;pointer-events:none;
+    background:radial-gradient(circle 9px at 12px 16px, rgba(56,160,97,.28), transparent 72%),
+               radial-gradient(circle 13px at 56px 42px, rgba(56,160,97,.20), transparent 72%),
+               radial-gradient(circle 6px at 104px 12px, rgba(56,160,97,.24), transparent 72%)}
+  /* 页脚：波形分隔线收尾 */
+  footer .wrap::before{content:"";display:block;height:16px;margin-bottom:12px;opacity:.4;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16'%3E%3Cpath d='M0 8h32l9-6 13 12 13-12 9 6h124' fill='none' stroke='%2338a061' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain}
 
   /* ============ 合作单位及成果 ============ */
   /* 合作单位 logo 墙 */
@@ -219,6 +251,13 @@
     .grid-3,.naming,.func-grid,.grid-2{grid-template-columns:1fr}
     .links{display:none}
     .bg::after,.bg::before{display:none}
+    .func.wide{flex-direction:column;align-items:stretch}
+    .func.wide .media-frame{flex:none;margin-bottom:14px}
+  }
+  @media (max-width:560px){
+    .flow{flex-wrap:wrap}
+    .flow-step{flex:1 1 42%}
+    .flow-arrow{display:none}
   }
 
   /* ============ 打印 / 导出 PDF 优化 ============ */
@@ -414,7 +453,7 @@
       <div class="sec-head reveal">
         <span class="kicker">Functions</span>
         <h2>具体功能</h2>
-        <p>每项功能配套测试视频 / 测试图，直观呈现真实测量效果（占位待补充）。</p>
+        <p>每项功能配套真实测试视频，直观呈现实际测量效果。</p>
       </div>
 
       <div class="func-grid">
@@ -444,24 +483,12 @@
 
         <div class="func reveal">
           <div class="media-frame">
-            <video class="media-video" poster="poster-03.jpg" controls playsinline preload="none">
-              <source src="video-03.mp4" type="video/mp4" />
-            </video>
-            <img class="media-poster" src="poster-03.jpg" alt="功能 03 演示画面" />
-          </div>
-          <div class="f-head"><span class="f-num">03</span><h3>高保真低噪声模拟前端</h3></div>
-          <div class="tags"><span>ADA4350</span><span>飞安级 TIA</span><span>0.2–5Hz 带通</span></div>
-          <p>集成 FET 输入的 ADA4350 构建跨阻放大器前端，飞安级超低输入偏置电流确保微弱光电流高保真转换，级联精准带通滤波匹配人体 PPG 生理特征。</p>
-        </div>
-
-        <div class="func reveal">
-          <div class="media-frame">
             <video class="media-video" poster="poster-04.jpg" controls playsinline preload="none">
               <source src="video-04.mp4" type="video/mp4" />
             </video>
-            <img class="media-poster" src="poster-04.jpg" alt="功能 04 演示画面" />
+            <img class="media-poster" src="poster-04.jpg" alt="功能 03 演示画面" />
           </div>
-          <div class="f-head"><span class="f-num">04</span><h3>AI 智能解析与风险分级</h3></div>
+          <div class="f-head"><span class="f-num">03</span><h3>AI 智能解析与风险分级</h3></div>
           <div class="tags"><span>CNN</span><span>Transformer</span><span>GRU</span><span>高血压分类 &gt;90%</span></div>
           <p>深度可分离 CNN 提取局部特征、Transformer 分析长程关联、GRU 建模时序动态，三阶段特征融合实现心血管风险智能识别与早期预警。</p>
         </div>
@@ -471,23 +498,39 @@
             <video class="media-video" poster="poster-05.jpg" controls playsinline preload="none">
               <source src="video-05.mp4" type="video/mp4" />
             </video>
-            <img class="media-poster" src="poster-05.jpg" alt="功能 05 演示画面" />
+            <img class="media-poster" src="poster-05.jpg" alt="功能 04 演示画面" />
           </div>
-          <div class="f-head"><span class="f-num">05</span><h3>新型光电器件兼容测试与验证</h3></div>
+          <div class="f-head"><span class="f-num">04</span><h3>新型光电器件兼容测试与验证</h3></div>
           <div class="tags"><span>器件兼容</span><span>快速原型</span><span>标准化平台</span></div>
           <p>作为国际首块兼容非接触式 PPG 测试验证板，为新型光电器件（异质结光电二极管、量子点器件等）提供从器件评估到系统集成的标准化高效验证方案。</p>
         </div>
 
-        <div class="func reveal">
+        <div class="func reveal wide">
           <div class="media-frame">
             <video class="media-video" poster="poster-06.jpg" controls playsinline preload="none">
               <source src="video-06.mp4" type="video/mp4" />
             </video>
-            <img class="media-poster" src="poster-06.jpg" alt="功能 06 演示画面" />
+            <img class="media-poster" src="poster-06.jpg" alt="功能 05 演示画面" />
           </div>
-          <div class="f-head"><span class="f-num">06</span><h3>即放即用 · 24h 连续监测</h3></div>
-          <div class="tags"><span>物理隔离</span><span>即放即用</span><span>远程数据流</span></div>
-          <p>无需佩戴与操作，放置即可测量；支持 24 小时不间断数据流与远程健康监测，为长期趋势管理与异常预警提供连续数据支撑。</p>
+          <div class="f-body">
+            <div class="f-head"><span class="f-num">05</span><h3>即放即用 · 24h 连续监测</h3></div>
+            <div class="tags"><span>物理隔离</span><span>即放即用</span><span>远程数据流</span></div>
+            <p>无需佩戴与操作，放置即可测量，支持 24 小时不间断数据流与远程健康监测。</p>
+            <ul class="checklist">
+              <li>24h 连续数据流，全程不间断</li>
+              <li>远程健康监测，随时回看</li>
+              <li>长期趋势管理与异常预警</li>
+            </ul>
+            <div class="flow">
+              <div class="flow-step"><span class="fs-num">1</span><span class="fs-label">放置</span></div>
+              <svg class="flow-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              <div class="flow-step"><span class="fs-num">2</span><span class="fs-label">自动采集</span></div>
+              <svg class="flow-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              <div class="flow-step"><span class="fs-num">3</span><span class="fs-label">实时传输</span></div>
+              <svg class="flow-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              <div class="flow-step"><span class="fs-num">4</span><span class="fs-label">远程查看</span></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
