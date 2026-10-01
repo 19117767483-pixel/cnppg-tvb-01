@@ -205,6 +205,27 @@
   /* 页脚：波形分隔线收尾 */
   footer .wrap::before{content:"";display:block;height:16px;margin-bottom:12px;opacity:.4;
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16'%3E%3Cpath d='M0 8h32l9-6 13 12 13-12 9 6h124' fill='none' stroke='%2338a061' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain}
+  /* 大号幽灵序号：每个 section 右上角超大超浅的编号（01–05） */
+  .wrap{position:relative}
+  section .wrap::before{position:absolute;right:8px;top:-16px;font-size:150px;font-weight:900;line-height:1;
+    color:var(--g800);opacity:.05;pointer-events:none;letter-spacing:0}
+  #overview .wrap::before{content:"01"}
+  #features .wrap::before{content:"02"}
+  #functions .wrap::before{content:"03"}
+  #scenes .wrap::before{content:"04"}
+  #partners .wrap::before{content:"05"}
+  /* 功能卡右上角：淡波形角标 */
+  .func{position:relative}
+  .func::after{content:"";position:absolute;top:14px;right:14px;width:52px;height:10px;opacity:.16;pointer-events:none;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 10'%3E%3Cpath d='M0 5h7l2.5-4 3.5 8 3.5-8 2.5 4h33' fill='none' stroke='%2338a061' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain}
+  /* 场景卡左上角：柔光点 */
+  .scene::before{content:"";position:absolute;top:10px;left:12px;width:24px;height:24px;pointer-events:none;
+    background:radial-gradient(circle 4px at 7px 7px, rgba(56,160,97,.30), transparent 70%),
+               radial-gradient(circle 2.5px at 17px 17px, rgba(56,160,97,.22), transparent 70%)}
+  /* 收尾大卡：右下角大波形水印 */
+  .func.wide{overflow:hidden}
+  .func.wide::before{content:"";position:absolute;inset:0;opacity:.045;pointer-events:none;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120'%3E%3Cpath d='M0 60h60l14-30 22 60 22-60 14 30h268' fill='none' stroke='%231e5c3b' stroke-width='3'/%3E%3C/svg%3E") no-repeat 100% 120%/62% auto}
 
   /* ============ 合作单位及成果 ============ */
   /* 合作单位 logo 墙 */
@@ -477,8 +498,8 @@
             <img class="media-poster" src="poster-02.jpg" alt="功能 02 演示画面" />
           </div>
           <div class="f-head"><span class="f-num">02</span><h3>抗环境光干扰的信号采集</h3></div>
-          <div class="tags"><span>光谱抑制比 &gt;10³</span><span>近红外响应</span><span>弱光增强</span></div>
-          <p>无缝易集成光电二极管阵列与自滤光结构，在室内照明、自然光乃至夜间弱光下稳定提取微弱脉搏信号，显著优于传统宽带硅光电二极管。</p>
+          <div class="tags"><span>自适应光强</span><span>多场景适应</span><span>稳定信号</span></div>
+          <p>器件在室内照明、自然光、夜间弱光等复杂光照环境下均能自适应干扰变化，稳定采集高质量 PPG 信号，为后续智能解析提供可靠的信号基础。</p>
         </div>
 
         <div class="func reveal">
