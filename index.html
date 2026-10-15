@@ -88,6 +88,15 @@
   .media-frame{position:relative;border-radius:14px;overflow:hidden;background:#0b1a12;margin-bottom:14px}
   .media-video{width:100%;display:block;aspect-ratio:16/9;object-fit:contain;background:#0b1a12}
   .media-poster{display:none;width:100%;aspect-ratio:16/9;object-fit:cover}
+  /* 双视频并列播放：全宽大卡内两个等大视频 + 说明小标签 */
+  .media-duo{display:flex;gap:6px}
+  .duo-cell{flex:1;min-width:0;display:flex;flex-direction:column}
+  .duo-cell .media-video{width:100%}
+  .duo-cell .media-poster{flex:1;min-width:0;object-fit:cover}
+  .duo-cap{font-size:11.5px;font-weight:600;color:#d8f0e2;text-align:center;padding:7px 8px 9px;background:#0b1a12;letter-spacing:.6px}
+  /* 全宽卡的纵向堆叠变体：视频区通栏，文字置底 */
+  .func.wide.stack{flex-direction:column;align-items:stretch}
+  .func.wide.stack .media-frame{flex:none;margin-bottom:14px}
   .hero-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
   .hero-logo{width:72px;height:72px;border-radius:20px;background:#fff;box-shadow:var(--sh-md);display:flex;align-items:center;justify-content:center;padding:8px}
   .hero-logo img{width:100%;height:100%;object-fit:contain}
@@ -279,6 +288,7 @@
     .flow{flex-wrap:wrap}
     .flow-step{flex:1 1 42%}
     .flow-arrow{display:none}
+    .media-duo{flex-direction:column}
   }
 
   /* ============ 打印 / 导出 PDF 优化 ============ */
@@ -563,32 +573,32 @@
       <div class="sec-head reveal">
         <span class="kicker">Validation</span>
         <h2>场景验证</h2>
-        <p>从居家到户外、从静止到行驶，五大真实场景实测视频，直观呈现产品的环境适应能力与全天候可靠性。</p>
+        <p>从居家到户外、从静止到行驶，手掌、脚趾多部位实测视频，直观呈现产品的环境适应能力与全天候可靠性。</p>
       </div>
 
       <div class="func-grid">
-        <div class="func reveal">
-          <div class="media-frame">
-            <video class="media-video" poster="poster-v1.jpg" controls playsinline preload="none">
-              <source src="video1.mp4" type="video/mp4" />
-            </video>
-            <img class="media-poster" src="poster-v1.jpg" alt="场景 01 演示画面" />
+        <div class="func reveal wide stack">
+          <div class="media-frame media-duo">
+            <div class="duo-cell">
+              <video class="media-video" poster="poster-v1.jpg" controls playsinline preload="none">
+                <source src="video1.mp4" type="video/mp4" />
+              </video>
+              <img class="media-poster" src="poster-v1.jpg" alt="场景 01 演示画面一" />
+              <span class="duo-cap">隔有遮挡 · 精准测量</span>
+            </div>
+            <div class="duo-cell">
+              <video class="media-video" poster="poster-v2.jpg" controls playsinline preload="none">
+                <source src="video2.mp4" type="video/mp4" />
+              </video>
+              <img class="media-poster" src="poster-v2.jpg" alt="场景 01 演示画面二" />
+              <span class="duo-cap">自动增益 · 清晰可视</span>
+            </div>
           </div>
-          <div class="f-head"><span class="f-num">01</span><h3>非接触式测量</h3></div>
-          <div class="tags"><span>隔空测量</span><span>无感无扰</span><span>精准依旧</span></div>
-          <p>无需直接接触，手掌与测试芯片之间即使隔着隔离物，也能精准完成生命体征测量，让测量彻底摆脱佩戴与接触的束缚，无感之中守护每一刻健康。</p>
-        </div>
-
-        <div class="func reveal">
-          <div class="media-frame">
-            <video class="media-video" poster="poster-v2.jpg" controls playsinline preload="none">
-              <source src="video2.mp4" type="video/mp4" />
-            </video>
-            <img class="media-poster" src="poster-v2.jpg" alt="场景 02 演示画面" />
+          <div class="f-body">
+            <div class="f-head"><span class="f-num">01</span><h3>非接触式测量</h3></div>
+            <div class="tags"><span>隔有遮挡</span><span>自动增益</span><span>清晰可视</span></div>
+            <p>手掌与测试芯片之间即使隔着衣物等遮挡物，也能精准完成生命体征测量；系统自动匹配最佳增益，无需手动干预，波形清晰稳定、一眼可读，让测量既无感又可靠。</p>
           </div>
-          <div class="f-head"><span class="f-num">02</span><h3>自适应增益调节</h3></div>
-          <div class="tags"><span>自动增益</span><span>智能适配</span><span>清晰可视</span></div>
-          <p>系统根据被测对象与测量环境自动匹配最佳增益，无需手动干预，信号波形清晰稳定、一眼可读，让每一次测量都看得见、看得清，可视化能力出众。</p>
         </div>
 
         <div class="func reveal">
@@ -596,9 +606,9 @@
             <video class="media-video" poster="poster-v3.jpg" controls playsinline preload="none">
               <source src="video3.mp4" type="video/mp4" />
             </video>
-            <img class="media-poster" src="poster-v3.jpg" alt="场景 03 演示画面" />
+            <img class="media-poster" src="poster-v3.jpg" alt="场景 02 演示画面" />
           </div>
-          <div class="f-head"><span class="f-num">03</span><h3>户外环境光测试</h3></div>
+          <div class="f-head"><span class="f-num">02</span><h3>户外环境光测试</h3></div>
           <div class="tags"><span>抗环境光</span><span>户外精准</span><span>全天候适用</span></div>
           <p>烈日直射、树影明暗交替，复杂多变的户外光照之下测量依然精准稳定，环境光不再是健康监测的障碍，随时随地都能测得准、测得稳。</p>
         </div>
@@ -608,30 +618,35 @@
             <video class="media-video" poster="poster-v4.jpg" controls playsinline preload="none">
               <source src="video4.mp4" type="video/mp4" />
             </video>
-            <img class="media-poster" src="poster-v4.jpg" alt="场景 04 演示画面" />
+            <img class="media-poster" src="poster-v4.jpg" alt="场景 03 演示画面" />
           </div>
-          <div class="f-head"><span class="f-num">04</span><h3>行驶中测试</h3></div>
+          <div class="f-head"><span class="f-num">03</span><h3>行驶中测试</h3></div>
           <div class="tags"><span>车载动态</span><span>抗颠簸振动</span><span>移动守护</span></div>
           <p>车辆行驶中的颠簸、振动与光线变化之下，依然连续输出稳定精准的生命体征数据，为智能座舱与车载健康监测提供坚实可靠的场景支撑。</p>
         </div>
 
-        <div class="func reveal wide">
+        <div class="func reveal">
           <div class="media-frame">
             <video class="media-video" poster="poster-v5.jpg" controls playsinline preload="none">
               <source src="video5.mp4" type="video/mp4" />
             </video>
-            <img class="media-poster" src="poster-v5.jpg" alt="场景 05 演示画面" />
+            <img class="media-poster" src="poster-v5.jpg" alt="场景 04 演示画面" />
           </div>
-          <div class="f-body">
-            <div class="f-head"><span class="f-num">05</span><h3>居家测试</h3></div>
-            <div class="tags"><span>日常起居</span><span>操作简单</span><span>持续守护</span></div>
-            <p>无需专业指导，日常起居中放置即可测量，操作简单、结果直观，把专业级的健康监测带进千家万户，让关爱时刻在线。</p>
-            <ul class="checklist">
-              <li>日常起居随手测量，无感自然</li>
-              <li>结果实时呈现，家人共享健康动态</li>
-              <li>长期连续记录，趋势一目了然</li>
-            </ul>
+          <div class="f-head"><span class="f-num">04</span><h3>居家测试</h3></div>
+          <div class="tags"><span>日常起居</span><span>操作简单</span><span>持续守护</span></div>
+          <p>无需专业指导，日常起居中放置即可测量，操作简单、结果直观，把专业级的健康监测带进千家万户，让关爱时刻在线。</p>
+        </div>
+
+        <div class="func reveal">
+          <div class="media-frame">
+            <video class="media-video" poster="poster-v6.jpg" controls playsinline preload="none">
+              <source src="video6.mp4" type="video/mp4" />
+            </video>
+            <img class="media-poster" src="poster-v6.jpg" alt="场景 05 演示画面" />
           </div>
+          <div class="f-head"><span class="f-num">05</span><h3>多部位隔空测量</h3></div>
+          <div class="tags"><span>手掌脚趾</span><span>多部位适用</span><span>姿势自由</span></div>
+          <p>不止于手掌——脚趾等不同部位同样可以隔空完成精准测量，测量部位与姿势自由选择，轻松获得稳定可靠的生命体征数据，一台设备覆盖全家健康需求。</p>
         </div>
       </div>
     </div>
